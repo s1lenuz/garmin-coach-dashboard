@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>本周训练课表 · Garmin 教练周计划</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="28" height="28"><path d="M8 24c4-9 9-13 12-13s8 4 12 13" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="12" r="3" fill="#fff"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>本周训练课表</h1>
+        <p>依据近 14 天负荷 / HRV / 睡眠自动编排 · 每日 06:47 更新</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <nav class="site-nav" aria-label="页面导航">
+        <a href="index.html">大屏</a>
+        <a href="coach.html" class="active">周计划</a>
+        <a href="widget.html">Widget</a>
+      </nav>
+      <a href="data/plan.ics" class="btn btn-primary">订阅 ICS 日历</a>
+    </div>
+  </header>
+
+  <div class="page-head">
+    <h1>反向链路：课表怎么到手表</h1>
+    <p>架构图里这条线是「我生成课表 → 佳明训练库 → Connect App → 推送到手表 → 你照着跑」。
+       需要说明的是：<b>Garmin Connect Personal API 只提供只读端点</b>，没有写入训练计划的接口，
+       所以下面这段目前只能靠日历订阅或手动录入完成，本站不会假装能自动推送。</p>
+    <div class="flow-row">
+      <span class="flow-node">✓ 自动生成课表</span><span class="flow-arrow">→</span>
+      <span class="flow-node">plan.json / plan.ics</span><span class="flow-arrow">→</span>
+      <span class="flow-node muted">手动导入 Connect 训练库</span><span class="flow-arrow">→</span>
+      <span class="flow-node muted">Connect App 同步</span><span class="flow-arrow">→</span>
+      <span class="flow-node muted">推送到手表</span><span class="flow-arrow">→</span>
+      <span class="flow-node">你照着跑</span>
+    </div>
+  </div>
+
+  <section class="card plan-card">
+    <div class="card-head">
+      <div><h2>本周计划</h2><p class="card-sub" id="weekly-goal">读取中…</p></div>
+      <span class="plan-badge" id="plan-status">读取中…</span>
+    </div>
+    <div class="coach-note" id="coach-note">读取中…</div>
+    <div class="plan-grid" id="plan-grid"></div>
+    <div class="readonly-box" id="readonly-box"></div>
+  </section>
+
+  <section class="card plan-card">
+    <div class="card-head">
+      <div><h2>录入清单 / 日历订阅</h2><p class="card-sub">可直接复制进 Garmin Connect「创建训练」，或订阅日历自动提醒</p></div>
+      <div class="plan-links">
+        <a href="data/plan.ics">订阅 ICS</a>
+        <a href="data/workout-checklist.md" target="_blank" rel="noopener">打开清单</a>
+        <a href="data/plan.json" target="_blank" rel="noopener">plan.json</a>
+        <button type="button" id="btn-copy">复制清单</button>
+      </div>
+    </div>
+    <pre class="checklist" id="checklist">读取中…</pre>
+  </section>
+
+  <section class="card plan-card">
+    <div class="card-head"><div><h2>想让教练看到你的「神仙球」？</h2><p class="card-sub">对应架构图里「踢球截图 → 你发」那条线</p></div></div>
+    <p class="fine" style="font-size:12.5px;line-height:1.9;color:#5b6478">
+      在仓库 <code>inbox/NOTES.md</code> 里随手写一句（例如「昨天踢球进了个神仙球，右腿有点酸」），
+      提交后第二天 06:47 的构建会把最后几行并入教练评语，并据此微调当周强度。
+      截图文件也可以放进 <code>inbox/</code> 目录留档；当前 DeepSeek 走的是文本接口，暂不做图像识别，
+      所以图片只作为记录、不会自动解读。
+    </p>
+  </section>
+
+  <div class="privacy-note">
+    <b>隐私提示：</b>本页数据来自公开 GitHub Pages 快照，任何获知 URL 的人都能查看。请勿公开分享链接。
+  </div>
+
+  <footer class="footer">
+    <span>课表为描述性建议，不构成医疗或专业训练处方；身体不适请优先休息并咨询专业人士。</span>
+    <span class="disclaimer">部署：GitHub Pages / Actions · 数据：Garmin Connect Personal API（只读）</span>
+  </footer>
+</div>
+<div id="toast" class="toast" hidden></div>
+<script src="coach.js"></script>
+</body>
+</html>

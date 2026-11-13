@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garmin Widget · 今日状态</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body class="widget-page">
+<div>
+  <div class="widget-card">
+    <div class="widget-head">
+      <h1>Garmin · 今日状态</h1>
+      <p id="widget-sub">每日 06:47 自动更新 · 读取中…</p>
+    </div>
+    <div class="widget-kpis" id="widget-kpis"></div>
+    <div class="widget-plan">
+      <div class="wp-title">今日课表</div>
+      <div class="wp-main" id="widget-plan-main">—</div>
+      <div class="wp-detail" id="widget-plan-detail">—</div>
+    </div>
+    <div class="widget-foot">
+      <span id="widget-updated">—</span>
+      <a href="index.html">打开大屏 ↗</a>
+    </div>
+  </div>
+  <div class="widget-tips" id="widget-tips">
+    <b>放到手机桌面：</b>用支持网页小组件的 App（iOS 的 Scriptable / Widgetly、Android 的 KWGT 等）读取
+    <code>data/widget.json</code> 或把本页以 iframe 嵌入；直接把本页加到主屏幕也可以。
+    数据取自同一份每日快照，不含任何密钥。
+  </div>
+</div>
+<script src="widget.js"></script>
+</body>
+</html>

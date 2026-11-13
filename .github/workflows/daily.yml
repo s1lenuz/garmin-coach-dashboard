@@ -1,0 +1,73 @@
+name: 每日 06:47 生成健康快照并发布 Pages
+
+# GitHub Actions 的 cron 使用 UTC。UTC 22:47 = 次日北京时间 06:47（UTC+8）。
+# 对应架构图：佳明云 ← 读取 ← 我（教练）定时任务 每天 6:47
+# 说明：GitHub 不保证 cron 准点，高峰期可能延迟数分钟到数十分钟。
+
+on:
+  schedule:
+    - cron: '47 22 * * *'
+  workflow_dispatch:
+    inputs:
+      demo:
+        description: '强制使用演示数据（不调用 Garmin / DeepSeek）'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-health-snapshot
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 准备 Python（仅标准库，无 pip 依赖）
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 生成静态快照 + AI 解读 + 周计划
+        env:
+          # 凭证只在此处注入进程环境，绝不写入任何产物或日志
+          GARMIN_PERSONAL_API_KEY: ${{ secrets.GARMIN_PERSONAL_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GARMIN_REGION: ${{ vars.GARMIN_REGION || 'global' }}
+          GARMIN_API_BASE: ${{ vars.GARMIN_API_BASE || '' }}
+          DEEPSEEK_BASE_URL: ${{ vars.DEEPSEEK_BASE_URL || 'https://api.deepseek.com' }}
+          DEEPSEEK_MODEL: ${{ vars.DEEPSEEK_MODEL || 'deepseek-flash' }}
+          DEEPSEEK_THINKING: ${{ vars.DEEPSEEK_THINKING || '0' }}
+          # 哪些时间范围调用大模型；设为 0 可完全关闭以节省 token
+          SITE_LLM_RANGES: ${{ vars.SITE_LLM_RANGES || '7,14,30,90' }}
+          DATA_SOURCE: auto
+          HTTP_TIMEOUT: '30'
+        run: |
+          if [ "${{ inputs.demo }}" = "true" ]; then
+            python scripts/build_site.py --demo
+          else
+            python scripts/build_site.py
+          fi
+
+      - name: 提交快照（Pages 由 main /docs 自动部署）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data
+          if git diff --cached --quiet; then
+            echo "快照内容无变化，跳过提交"
+          else
+            git commit -m "chore(data): 每日健康快照 $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
+
+      - name: 失败提示
+        if: failure()
+        run: |
+          echo "::warning::每日快照构建失败。常见原因：Personal API Key 过期 / 地区选错 / DeepSeek 余额不足。请在 Settings → Secrets and variables → Actions 检查后手动重跑。"

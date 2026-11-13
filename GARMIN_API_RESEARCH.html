@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garmin 数据接口调研与看板架构说明</title>
+<style>
+  :root{--bg:#f4f6fb;--card:#fff;--bd:#e7ecf5;--tx:#101a2e;--tx2:#52607a;--tx3:#94a2b8;--ac:#4f46e5;--ac2:#7c3aed;--ok:#0d9488;--warn:#d97706}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 26px 60px}
+  .hero{background:linear-gradient(120deg,#4f46e5,#6366f1 55%,#7c3aed);color:#fff;border-radius:18px;padding:30px 34px;box-shadow:0 12px 34px rgba(79,70,229,.22)}
+  .hero .kicker{font-size:12px;letter-spacing:2px;opacity:.85;font-weight:700}
+  .hero h1{margin:8px 0 8px;font-size:27px;letter-spacing:-.5px}
+  .hero p{margin:0;opacity:.92;font-size:13.5px}
+  .hero .meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .hero .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:4px 11px;border-radius:999px;font-size:11.5px}
+  h2{font-size:19px;margin:34px 0 6px;letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+  h2 .n{width:26px;height:26px;border-radius:8px;background:#e9ebff;color:var(--ac);font-size:12px;display:grid;place-items:center;font-weight:800}
+  .lead{color:var(--tx3);font-size:12.5px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px 22px;box-shadow:0 1px 2px rgba(16,26,46,.04),0 6px 20px rgba(16,26,46,.035);margin-bottom:14px}
+  .callout{border-left:4px solid var(--ok);background:#eef9f6;border-color:#cdece4;border-radius:10px;padding:15px 18px;font-size:13.5px;margin-bottom:16px}
+  .callout.warn{border-left-color:var(--warn);background:#fff8ec;border-color:#f3dfbb}
+  .callout b{color:var(--ok)}
+  .callout.warn b{color:var(--warn)}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .tile{background:#f8f9fd;border:1px solid #eef1f8;border-radius:11px;padding:15px 16px}
+  .tile .t{font-size:12px;color:var(--tx3);font-weight:700;letter-spacing:.4px}
+  .tile .v{font-size:20px;font-weight:800;margin:5px 0 3px;letter-spacing:-.5px}
+  .tile .d{font-size:11.5px;color:var(--tx2);line-height:1.6}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:10px 11px;border-bottom:1px solid #eef1f8;vertical-align:top}
+  th{background:#f7f9fd;color:var(--tx2);font-size:11.5px;font-weight:700;letter-spacing:.3px}
+  tr:last-child td{border-bottom:0}
+  td code,li code,p code{background:#f1f3f9;padding:1px 5px;border-radius:4px;font:11.5px ui-monospace,Consolas,monospace;color:#3b4262}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .t-ok{background:#e5f6f3;color:#0b8075}.t-free{background:#eef1ff;color:#4a44b5}.t-warn{background:#fff4e1;color:#a2620e}.t-gray{background:#f1f3f9;color:#64748b}
+  ul{margin:8px 0 0;padding-left:20px;color:var(--tx2);font-size:13px}
+  li{padding:3px 0}
+  a{color:var(--ac);text-decoration:none;font-weight:600}
+  a:hover{text-decoration:underline}
+  .svgbox{background:#fbfcff;border:1px solid #eef1f8;border-radius:11px;padding:8px;overflow:auto}
+  svg{display:block;width:100%;height:auto}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  .steps li{counter-increment:s;position:relative;padding:10px 0 10px 42px;border-bottom:1px dashed #e8edf5;font-size:13px;color:var(--tx2)}
+  .steps li:last-child{border:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:9px;width:26px;height:26px;border-radius:8px;background:#e9ebff;color:var(--ac);font-weight:800;font-size:12px;display:grid;place-items:center}
+  .foot{margin-top:30px;font-size:11.5px;color:var(--tx3);border-top:1px solid var(--bd);padding-top:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  @media(max-width:760px){.grid3,.grid2{grid-template-columns:1fr}.wrap{padding:20px 14px 40px}.hero{padding:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">INTERFACE RESEARCH · 2026-11-12</div>
+    <h1>Garmin 数据接口调研 &amp; 健康看板架构说明</h1>
+    <p>结论先说：官方个人 API 已经开放，睡眠 / HRV / 卡路里三类数据可以合规地直接拉取，不需要模拟登录。</p>
+    <div class="meta">
+      <span>Garmin Connect Personal API</span><span>OAuth2 · ApiKey → Bearer</span>
+      <span>DeepSeek deepseek-flash</span><span>本地运行 · 零依赖</span>
+    </div>
+  </div>
+
+  <h2><span class="n">1</span>核心结论</h2>
+  <p class="lead">这半年接口政策变化很大，很多教程已经过时。</p>
+  <div class="callout">
+    <b>2026-10-21，Garmin 重新开放 Connect Developer Program</b>，并首次把个人用户单列为 <b>Personal</b> 层级：个人免费、无需审批、几秒钟自助生成 API Key，可读自己的活动与健康数据。此前（2026-03 起）该项目因 AI 生成应用申请暴增冻结了 7 个月，而且旧体系把所有人当企业审核，个人基本申请不下来。
+    <br>所以本项目走<b>官方 Personal API</b>，不用 <code>python-garminconnect</code> / <code>garth</code> 这类模拟网页登录的非官方方案，也不碰私有接口。
+  </div>
+  <div class="grid3">
+    <div class="tile"><div class="t">开放时间</div><div class="v">2026-10-21</div><div class="d">结束自 3 月起、长达 7 个月的新申请冻结</div></div>
+    <div class="tile"><div class="t">个人层级</div><div class="v">免费 · 即时</div><div class="d">自助生成 Key，无需公司信息、无需商业计划</div></div>
+    <div class="tile"><div class="t">本项目需要的三个指标</div><div class="v">全部可得</div><div class="d">睡眠、HRV、卡路里均属公开字段；被剥离的是 VO2max 等专有指标</div></div>
+  </div>
+
+  <h2><span class="n">2</span>三级权限对比</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>层级</th><th>面向对象</th><th>审批 / 费用</th><th>能力</th></tr></thead>
+      <tbody>
+        <tr><td><b>Personal</b> <span class="tag t-free">本项目</span></td><td>个人读自己的数据</td><td><span class="tag t-ok">免审批 · 免费</span></td><td>Activity / Health / Women's Health 的 JSON 摘要 + 完整 .FIT 文件；<b>仅 pull、仅只读</b></td></tr>
+        <tr><td>Starter</td><td>≤ 1000 用户的组织</td><td>近乎即时 · 免费</td><td>上面全部 + Courses / Training API（可推送路线、结构化训练）</td></tr>
+        <tr><td>Enterprise</td><td>&gt; 1000 用户</td><td>$1,000 入门费抵月费 + 按 MAU 计费，2027-04-01 起</td><td>上面全部 + Golf API、历史数据回填、技术支持</td></tr>
+      </tbody>
+    </table>
+    <p class="lead" style="margin:12px 0 0">另：<b>Garmin Health SDK</b> 是面向企业/机构、需商业授权的另一套方案；<b>Connect IQ</b> 是手表应用平台。两者都与本看板无关。Connect IQ 保持免费不变。</p>
+  </div>
+
+  <h2><span class="n">3</span>认证链路与关键约束</h2>
+  <div class="card">
+    <div class="svgbox">
+      <svg viewBox="0 0 900 230" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Microsoft YaHei,sans-serif">
+        <rect x="20" y="30" width="190" height="56" rx="10" fill="#eef1ff" stroke="#d9dffb"/>
+        <text x="115" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#3730a3">本机看板服务</text>
+        <text x="115" y="71" text-anchor="middle" font-size="11" fill="#6366f1">server.py</text>
+        <rect x="690" y="30" width="190" height="56" rx="10" fill="#e9f7f4" stroke="#bfe9df"/>
+        <text x="785" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#0b7a6e">Garmin Personal API</text>
+        <text x="785" y="71" text-anchor="middle" font-size="11" fill="#0d9488">connectapi.garmin.com / .cn</text>
+
+        <line x1="210" y1="50" x2="688" y2="50" stroke="#4f46e5" stroke-width="2" marker-end="url(#ar)"/>
+        <text x="450" y="42" text-anchor="middle" font-size="11.5" fill="#4f46e5" font-weight="700">① POST /personal-api-key/token　Authorization: ApiKey &lt;KEY&gt;</text>
+        <line x1="688" y1="76" x2="212" y2="76" stroke="#0d9488" stroke-width="2" marker-end="url(#ar2)"/>
+        <text x="450" y="94" text-anchor="middle" font-size="11.5" fill="#0d9488" font-weight="700">② access_token（JWT，24 小时，无 refresh token）</text>
+
+        <line x1="210" y1="135" x2="688" y2="135" stroke="#4f46e5" stroke-width="2" marker-end="url(#ar)"/>
+        <text x="450" y="127" text-anchor="middle" font-size="11.5" fill="#4f46e5" font-weight="700">③ GET /sleep-service/... /hrv-service/... /usersummary-service/...</text>
+        <text x="450" y="152" text-anchor="middle" font-size="11" fill="#64748b">Authorization: Bearer &lt;access_token&gt;　（Key 本身绝不发给业务端点）</text>
+        <line x1="688" y1="171" x2="212" y2="171" stroke="#0d9488" stroke-width="2" marker-end="url(#ar2)"/>
+        <text x="450" y="189" text-anchor="middle" font-size="11.5" fill="#0d9488" font-weight="700">④ 健康数据 JSON → 本地缓存 → 规范化 → 统计 → 看板 / 大模型解读</text>
+        <defs>
+          <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#4f46e5"/></marker>
+          <marker id="ar2" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0d9488"/></marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="tile"><div class="t">Key 与 token</div><div class="d">Key 有效期 30 / 90 / 180 / 365 天，<b>只显示一次</b>，可随时撤销；token 24 小时有效且无 refresh token，过期用同一个 Key 重新换即可。代码解析 JWT 的 <code>exp</code> 并按 23 小时保守缓存，遇 401 自动重换重试一次。</div></div>
+      <div class="tile"><div class="t">中国区主机</div><div class="d">全球区 <code>personal.connectapi.garmin.com</code>；中国区账号实测走 <code>personal.connectapi.garmin.cn</code>。本项目用 <code>GARMIN_REGION=cn|global</code> 自动切换，也支持显式覆盖。单一账户实测通过不代表所有中国区账户均可用，需自行做最小只读验证。</div></div>
+      <div class="tile"><div class="t">被剥离的专有指标</div><div class="d">经 API 下发的 .FIT 会移除 VO2 max、恢复时间、训练效果、乳酸阈值等未文档化字段（手动从 Connect 下载原始 .FIT 仍有）。<b>睡眠、心率、HRV、卡路里不受影响。</b></div></div>
+      <div class="tile"><div class="t">字段不保证一致</div><div class="d">不同设备 / 地区 / 账户返回的字段可能不同。本项目做多候选映射、找不到就留 <code>null</code>，并把原始 JSON 完整留存到 <code>data/raw/</code>，看板里可一键查看核对，绝不猜字段含义或把缺失补成 0。</div></div>
+    </div>
+  </div>
+
+  <h2><span class="n">4</span>看板架构</h2>
+  <div class="card">
+    <div class="svgbox">
+      <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Microsoft YaHei,sans-serif">
+        <rect x="18" y="20" width="200" height="52" rx="10" fill="#e9f7f4" stroke="#bfe9df"/>
+        <text x="118" y="41" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0b7a6e">Garmin Personal API</text>
+        <text x="118" y="59" text-anchor="middle" font-size="10.5" fill="#0d9488">官方只读 · pull</text>
+        <rect x="700" y="20" width="182" height="52" rx="10" fill="#fff4e1" stroke="#f3dfbb"/>
+        <text x="791" y="41" text-anchor="middle" font-size="12.5" font-weight="700" fill="#a2620e">DeepSeek API</text>
+        <text x="791" y="59" text-anchor="middle" font-size="10.5" fill="#d97706">deepseek-flash</text>
+
+        <rect x="270" y="92" width="360" height="52" rx="10" fill="#eef1ff" stroke="#d9dffb"/>
+        <text x="450" y="113" text-anchor="middle" font-size="13" font-weight="700" fill="#3730a3">server.py　本地 HTTP 服务（127.0.0.1:8765）</text>
+        <text x="450" y="131" text-anchor="middle" font-size="10.5" fill="#6366f1">/api/dashboard　/api/config　/api/raw　/api/test　/api/interpret</text>
+
+        <line x1="118" y1="72" x2="330" y2="92" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#g)"/>
+        <line x1="791" y1="72" x2="570" y2="92" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#g)"/>
+
+        <g font-size="11" font-weight="700" text-anchor="middle">
+          <rect x="18" y="176" width="200" height="64" rx="9" fill="#f8f9fd" stroke="#e7ecf5"/><text x="118" y="200" fill="#3730a3">garmin_client</text><text x="118" y="219" font-size="10" font-weight="400" fill="#64748b">token / 端点 / 逐日降级</text>
+          <rect x="238" y="176" width="200" height="64" rx="9" fill="#f8f9fd" stroke="#e7ecf5"/><text x="338" y="200" fill="#3730a3">normalizer</text><text x="338" y="219" font-size="10" font-weight="400" fill="#64748b">字段映射 · 缺失留 null</text>
+          <rect x="458" y="176" width="200" height="64" rx="9" fill="#f8f9fd" stroke="#e7ecf5"/><text x="558" y="200" fill="#3730a3">analyzer</text><text x="558" y="219" font-size="10" font-weight="400" fill="#64748b">均线 / 环比 / 相关性</text>
+          <rect x="678" y="176" width="204" height="64" rx="9" fill="#f8f9fd" stroke="#e7ecf5"/><text x="780" y="200" fill="#3730a3">llm_interpreter</text><text x="780" y="219" font-size="10" font-weight="400" fill="#64748b">缓存 / 失败降级</text>
+        </g>
+        <line x1="330" y1="144" x2="118" y2="176" stroke="#c7d0e4" stroke-width="1.4"/>
+        <line x1="410" y1="144" x2="338" y2="176" stroke="#c7d0e4" stroke-width="1.4"/>
+        <line x1="490" y1="144" x2="558" y2="176" stroke="#c7d0e4" stroke-width="1.4"/>
+        <line x1="570" y1="144" x2="780" y2="176" stroke="#c7d0e4" stroke-width="1.4"/>
+
+        <rect x="238" y="256" width="420" height="38" rx="9" fill="#eef1ff" stroke="#d9dffb"/>
+        <text x="448" y="280" text-anchor="middle" font-size="12" font-weight="700" fill="#3730a3">浏览器看板：自绘 SVG 趋势图 · KPI · AI 解读（零 CDN / 可离线）</text>
+        <line x1="448" y1="240" x2="448" y2="256" stroke="#c7d0e4" stroke-width="1.4" marker-end="url(#g)"/>
+        <defs><marker id="g" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#94a3b8"/></marker></defs>
+      </svg>
+    </div>
+    <ul>
+      <li><b>零依赖</b>：只用 Python 3.9+ 标准库与浏览器原生能力，不需要 <code>pip install</code>、不加载任何 CDN。</li>
+      <li><b>缓存分层</b>：Garmin 数据按 TTL 缓存，原始 JSON 全量留存；DeepSeek 解读按统计内容哈希缓存，重复刷新不重复计费。</li>
+      <li><b>降级链</b>：范围端点失败 → 逐日端点；Garmin 不可用 → 上次缓存 → 演示数据；DeepSeek 不可用 → 基于真实统计的规则解读。每一级都在界面上明确标注，不静默伪造。</li>
+      <li><b>隐私</b>：只把聚合统计（周均值、环比、异常日、相关系数）发给大模型，不发送逐日明细、账户标识或任何密钥。</li>
+    </ul>
+  </div>
+
+  <h2><span class="n">5</span>端点与字段映射</h2>
+  <div class="card">
+    <p class="lead" style="margin:0 0 10px">官方 Personal API 1.0.0 Swagger 共 26 个 GET 端点，本项目只取 7 个（含降级路径）。</p>
+    <table>
+      <thead><tr><th style="width:32%">用途</th><th>路径</th><th style="width:22%">参数</th></tr></thead>
+      <tbody>
+        <tr><td>连通性验证</td><td><code>GET /userprofile-service/userprofile/settings</code></td><td>—</td></tr>
+        <tr><td>睡眠（范围，优先）</td><td><code>GET /sleep-service/sleep/dailySleepSummariesByDate</code></td><td>startDate, endDate</td></tr>
+        <tr><td>睡眠（单日，降级）</td><td><code>GET /sleep-service/sleep/dailySleep</code></td><td>date</td></tr>
+        <tr><td>HRV（范围，优先）</td><td><code>GET /hrv-service/hrv/daily/{fromDate}/{toDate}</code></td><td>路径参数</td></tr>
+        <tr><td>HRV（单日，降级）</td><td><code>GET /hrv-service/hrv/{calendarDate}</code></td><td>路径参数</td></tr>
+        <tr><td>日汇总 / 卡路里（范围）</td><td><code>GET /usersummary-service/v2/dailysummaries</code></td><td>startDate, endDate</td></tr>
+        <tr><td>日汇总 / 卡路里（单日）</td><td><code>GET /usersummary-service/usersummary/daily</code></td><td>calendarDate</td></tr>
+      </tbody>
+    </table>
+    <p class="lead" style="margin:16px 0 8px"><b>字段映射（节选）</b> — 完整候选表见 <code>normalizer.py</code> 的 <code>FIELD_CANDIDATES</code></p>
+    <table>
+      <thead><tr><th>统一字段</th><th>候选原始字段（按优先级）</th><th>换算</th></tr></thead>
+      <tbody>
+        <tr><td>睡眠评分</td><td><code>sleepScore.value</code> → <code>dailySleepDTO.sleepScore.value</code></td><td>—</td></tr>
+        <tr><td>睡眠时长 / 分期</td><td><code>sleepTimeSeconds</code> / <code>deepSleepSeconds</code> / <code>lightSleepSeconds</code> / <code>remSleepSeconds</code> / <code>awakeSleepSeconds</code></td><td>秒 ÷ 60 → 分钟</td></tr>
+        <tr><td>夜间 HRV</td><td><code>lastNightAvg</code> → <code>hrvSummary.lastNightAvg</code></td><td>—</td></tr>
+        <tr><td>HRV 个人基线</td><td><code>baseline.balancedLow / balancedUpper</code></td><td>—</td></tr>
+        <tr><td>总 / 活动 / 基础消耗</td><td><code>totalKilocalories</code> / <code>activeKilocalories</code> / <code>bmrKilocalories</code></td><td>—</td></tr>
+        <tr><td>步数</td><td><code>totalSteps</code> → <code>steps</code></td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2><span class="n">6</span>DeepSeek 解读侧现状</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>项</th><th>当前值</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>协议</td><td>OpenAI / Anthropic 兼容</td><td>本项目用 OpenAI 格式 <code>POST /chat/completions</code></td></tr>
+        <tr><td>base_url</td><td><code>https://api.deepseek.com</code></td><td>兼容 <code>/v1</code>，但 /v1 与模型版本无关</td></tr>
+        <tr><td>当前模型</td><td><code>deepseek-flash</code>（V4.1-Flash-1017）<span class="tag t-ok">推荐</span></td><td>另有 <code>deepseek-v4-pro</code></td></tr>
+        <tr><td>旧模型名</td><td><code>deepseek-chat</code> / <code>deepseek-reasoner</code> <span class="tag t-warn">2026-07-24 弃用</span></td><td>大量旧教程仍这么写，直接用会踩弃用告警</td></tr>
+        <tr><td>思考模式</td><td><code>thinking:{"type":"enabled"}</code> + <code>reasoning_effort</code></td><td>本项目用 <code>DEEPSEEK_THINKING=1</code> 开启</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn" style="margin:16px 0 0">
+      <b>提示词里明确禁止编造</b>：只输出能追溯到给定数值的结论，缺失就说"数据不足"，区分描述性统计与推测，不提供医疗诊断。若模型返回非 JSON、超时或未配置 Key，看板自动降级为<b>基于真实统计值的规则解读</b>，不会白屏，也不会编数据。
+    </div>
+  </div>
+
+  <h2><span class="n">7</span>你只需要做 3 件事</h2>
+  <div class="card">
+    <ol class="steps">
+      <li>在项目根目录把 <code>.env.example</code> 复制为 <code>.env</code>（这个文件不会进 Git）。</li>
+      <li>登录 Garmin Connect 网页版 → 设置 → <b>Personal API Key</b> → Create Key，选有效期（建议 1 年），<b>立刻复制</b>；填到 <code>GARMIN_PERSONAL_API_KEY</code>。中国区账号加一行 <code>GARMIN_REGION=cn</code>。</li>
+      <li>把 DeepSeek 的 Key 填到 <code>DEEPSEEK_API_KEY</code>，运行 <code>python server.py</code>，打开 <code>http://127.0.0.1:8765</code>。用右上角「测试连接」验证即可。</li>
+    </ol>
+    <div class="callout" style="margin:16px 0 0">
+      <b>不想现在配置也行</b>：不填任何 Key 时，看板自动用内置 90 天演示数据完整运行；直接双击 <code>web/index.html</code> 也能离线查看（已预生成 7/14/30/90 天四套数据）。
+    </div>
+  </div>
+
+  <h2><span class="n">8</span>参考资料</h2>
+  <div class="card">
+    <ul>
+      <li><a href="https://developer.garmin.com/gc-developer-program/personal/personal-faq" target="_blank" rel="noopener">Garmin Connect Personal API FAQ（官方）</a> — 认证、Key 有效期、token 规则</li>
+      <li><a href="https://developer.garmin.com/gc-developer-program/personal/swagger-docs/" target="_blank" rel="noopener">Personal API Swagger 文档（官方）</a> — 26 个 GET 端点与参数</li>
+      <li><a href="https://developer.garmin.com/gc-developer-program/overview/" target="_blank" rel="noopener">Connect Developer Program 概览（官方）</a></li>
+      <li><a href="https://github.com/garmin/connect-personal-api-python" target="_blank" rel="noopener">Garmin 官方 Python 示例</a></li>
+      <li><a href="https://connect.garmin.cn/app/settings/personalApiToken" target="_blank" rel="noopener">中国区 Personal API Key 设置页</a> · <a href="https://connect.garmin.com/app/settings/personalApiToken" target="_blank" rel="noopener">全球区设置页</a></li>
+      <li><a href="https://api-docs.deepseek.com/zh-cn" target="_blank" rel="noopener">DeepSeek API 文档</a> · <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">API Keys 控制台</a></li>
+      <li>分级政策报道：<a href="https://garminrumors.com/garmin-connect-developer-program-personal-starter-enterprise/" target="_blank" rel="noopener">Garmin Rumors</a> / DC Rainmaker（2026-10-21）</li>
+    </ul>
+  </div>
+
+  <div class="foot">
+    <span>本看板为描述性统计分析工具，不构成医疗建议或诊断。</span>
+    <span>API 可用性、字段完整性与条款以官方最新页面和你账户的实际返回为准。</span>
+  </div>
+</div>
+</body>
+</html>

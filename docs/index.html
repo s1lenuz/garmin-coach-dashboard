@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garmin 健康大屏 · 睡眠 / HRV / 卡路里</title>
+<meta name="description" content="每天 06:47 自动更新的 Garmin 健康趋势大屏：睡眠、HRV、卡路里消耗、AI 解读与本周训练课表。">
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="28" height="28"><path d="M8 24c4-9 9-13 12-13s8 4 12 13" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="12" r="3" fill="#fff"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>Garmin 健康大屏</h1>
+        <p>睡眠 · HRV · 卡路里消耗 &nbsp;|&nbsp; 每日 06:47 自动更新 · 解读由 DeepSeek 生成</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <nav class="site-nav" aria-label="页面导航">
+        <a href="index.html" class="active">大屏</a>
+        <a href="coach.html">周计划</a>
+        <a href="widget.html">Widget</a>
+      </nav>
+      <span id="source-badge" class="badge badge-loading">加载中…</span>
+      <div class="range-tabs" id="range-tabs">
+        <button type="button" data-days="7">7 天</button>
+        <button type="button" data-days="14">14 天</button>
+        <button type="button" data-days="30" class="active">30 天</button>
+        <button type="button" data-days="90">90 天</button>
+      </div>
+      <button type="button" id="btn-refresh" class="btn btn-ghost">重新载入</button>
+    </div>
+  </header>
+
+  <div class="snapshot-bar" id="snapshot-bar">
+    <span class="sb-item"><span class="sb-dot" id="sb-dot"></span><b>数据快照</b></span>
+    <span class="sb-item" id="sb-source">读取中…</span>
+    <span class="sb-item" id="sb-built">构建时间 —</span>
+    <span class="sb-item" id="sb-schedule">每天 06:47（北京时间）自动更新</span>
+    <span class="sb-item"><a href="data/plan.ics">订阅训练日历 ↗</a></span>
+  </div>
+
+  <div id="notice" class="notice" hidden></div>
+
+  <section class="kpi-grid" id="kpi-grid" aria-label="核心指标"></section>
+
+  <section class="charts">
+    <article class="card chart-card">
+      <div class="card-head">
+        <div><h2>睡眠结构与评分</h2><p class="card-sub" id="sleep-sub">加载中…</p></div>
+        <span class="card-tag tag-sleep">SLEEP</span>
+      </div>
+      <div id="chart-sleep" class="chart"></div>
+      <div class="card-foot" id="sleep-foot"></div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="card-head">
+        <div><h2>心率变异性 HRV</h2><p class="card-sub" id="hrv-sub">加载中…</p></div>
+        <span class="card-tag tag-hrv">HRV</span>
+      </div>
+      <div id="chart-hrv" class="chart"></div>
+      <div class="card-foot" id="hrv-foot"></div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="card-head">
+        <div><h2>卡路里消耗构成</h2><p class="card-sub" id="cal-sub">加载中…</p></div>
+        <span class="card-tag tag-cal">CALORIES</span>
+      </div>
+      <div id="chart-cal" class="chart"></div>
+      <div class="card-foot" id="cal-foot"></div>
+    </article>
+  </section>
+
+  <section class="card plan-card">
+    <div class="card-head">
+      <div><h2>本周教练课表</h2><p class="card-sub" id="weekly-goal">按近期负荷与恢复状态自动编排</p></div>
+      <div class="plan-head-row">
+        <span class="plan-badge" id="plan-status">读取中…</span>
+        <a href="coach.html" class="btn btn-primary">查看完整周计划 →</a>
+      </div>
+    </div>
+    <div class="coach-note" id="coach-note">加载中…</div>
+    <div class="plan-grid" id="plan-grid"></div>
+    <div class="plan-links">
+      <a href="data/plan.ics">订阅 ICS 日历</a>
+      <a href="data/workout-checklist.md" target="_blank" rel="noopener">录入清单</a>
+      <a href="widget.html">手机 Widget</a>
+      <button type="button" id="btn-copy-plan">复制课表</button>
+    </div>
+    <div class="readonly-box" id="readonly-box"></div>
+  </section>
+
+  <section class="bottom-grid">
+    <article class="card ai-card">
+      <div class="card-head">
+        <div><h2>AI 趋势解读</h2><p class="card-sub" id="ai-sub">基于当前时间范围的聚合统计生成</p></div>
+        <span class="card-tag tag-sleep" id="ai-source-tag">读取中</span>
+      </div>
+      <div id="ai-highlights" class="highlights"></div>
+      <div class="ai-sections" id="ai-sections"></div>
+      <div class="ai-foot" id="ai-foot"></div>
+    </article>
+
+    <div class="side-col">
+      <article class="card">
+        <div class="card-head"><div><h2>关联洞察</h2><p class="card-sub">指标间的统计相关性</p></div></div>
+        <div id="correlations"></div>
+        <p class="fine">相关系数仅表示统计关联，不代表因果关系；样本不足时不显示。</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><div><h2>异常日</h2><p class="card-sub">偏离个人均值 1.6 个标准差以上</p></div></div>
+        <div id="anomalies"></div>
+      </article>
+      <article class="card">
+        <div class="card-head"><div><h2>数据与字段</h2><p class="card-sub">快照中各指标的有效天数</p></div></div>
+        <div id="coverage"></div>
+        <a href="data/meta.json" target="_blank" rel="noopener" class="btn btn-ghost btn-full">查看构建元信息</a>
+      </article>
+    </div>
+  </section>
+
+  <div class="privacy-note">
+    <b>隐私提示：</b>本页是 GitHub Pages 上的公开静态快照，由 GitHub Actions 每天 06:47（北京时间）自动拉取真实 Garmin 数据并发布。
+    任何获知此 URL 的人都能查看其中的健康数据，且历史快照会留在 git 记录里。<b>请勿公开分享此链接</b>；如需停止发布，在仓库 Settings → Secrets 中删除 Key 或停用 daily workflow。
+  </div>
+
+  <footer class="footer">
+    <span>数据来源：Garmin Connect Personal API（官方只读） · 解读：DeepSeek · 部署：GitHub Pages / Actions</span>
+    <span class="disclaimer">本看板为描述性统计分析，不构成医疗建议或诊断。</span>
+  </footer>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

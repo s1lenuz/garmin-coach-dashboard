@@ -1,0 +1,11 @@
+# 看板运行时：仅使用 Python 3.9+ 标准库，无需安装任何第三方依赖。
+# 直接运行：python server.py    或双击桌面「Garmin 健康看板」图标
+#
+# 仅「构建/安装」步骤需要的可选依赖（本机 managed venv 已具备，运行时不加载）：
+#   pywin32     # create_shortcut.py 创建桌面 .lnk 快捷方式
+#   Pillow      # make_icon.py 生成 web/favicon.ico
+#
+# 若后续要接入第三方 SDK（可选，非必需）：
+#   openai>=1.0            # 替换 llm_interpreter.py 里的原生 HTTP 调用
+#   garminconnect>=0.2.x   # 仅在放弃官方 Personal API 时作为非官方数据源
+#   garth                  # 同上

@@ -1,0 +1,24 @@
+# 凭证：绝不入库
+.env
+*.env
+!.env.example
+
+# 本机缓存与健康数据：只忽略项目根目录的 data/，不要误伤 Pages 快照
+/data/
+__pycache__/
+*.pyc
+*.pyo
+
+# Pages 每日快照必须入库（Actions 会提交 docs/data/*.json）
+!docs/data/
+!docs/data/**
+
+# 本地验证截图与临时诊断脚本
+preview.png
+card_*.png
+final_live.png
+settings_modal.png
+icon_preview.png
+_*.py
+.env.tmp
+server.pid

@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-11-13T01:11:36.012454+00:00",
+  "week_start": "2026-11-13",
+  "week_end": "2026-11-19",
+  "status": {
+    "level": "maintain",
+    "label": "稳态维持",
+    "reason": "近 14 天夜间 HRV 均值 44 ms，个人基线下限约 39 ms；低于基线 2/12 天；睡眠评分均值 67 分；日均活动消耗 410 kcal；日均步数 4430。",
+    "window_days": 14,
+    "hrv_avg14": 43.708333333333336,
+    "baseline_low": 39.0,
+    "below_baseline_days": 2,
+    "hrv_covered_days": 12,
+    "sleep_score_avg14": 66.83333333333333,
+    "active_kcal_avg14": 410.5,
+    "steps_avg14": 4429.583333333333
+  },
+  "coach_note": "本周判定：**稳态维持**。近 14 天夜间 HRV 均值 44 ms，个人基线下限约 39 ms；低于基线 2/12 天；睡眠评分均值 67 分；日均活动消耗 410 kcal；日均步数 4430。\nAI 趋势解读：相关性上，睡眠时长 → 次日 HRV 呈强正相关（r=0.72，基于 25 组配对）。\n课表是建议不是医嘱；HRV 连续两天低于基线就把当天改成休息。",
+  "coach_note_source": "rule",
+  "weekly_goal": "本周合计建议训练 5 次 / 245 分钟，以「稳态维持」为主轴；重点观察 HRV 是否回到个人基线区间。",
+  "days": [
+    {
+      "date": "2026-11-13",
+      "weekday": "周五",
+      "type": "轻松跑",
+      "intensity": "低",
+      "duration_min": 40,
+      "detail": "有氧基础，全程鼻呼吸",
+      "calendar_time": "06:47",
+      "rest": false
+    },
+    {
+      "date": "2026-11-14",
+      "weekday": "周六",
+      "type": "间歇跑",
+      "intensity": "高",
+      "duration_min": 45,
+      "detail": "热身 10′ + 6×2′ 快跑（间休 2′）+ 放松 10′",
+      "calendar_time": "06:47",
+      "rest": false
+    },
+    {
+      "date": "2026-11-15",
+      "weekday": "周日",
+      "type": "恢复日",
+      "intensity": "休息",
+      "duration_min": 0,
+      "detail": "拉伸 / 泡沫轴，关注 HRV 是否回到基线",
+      "calendar_time": "08:00",
+      "rest": true
+    },
+    {
+      "date": "2026-11-16",
+      "weekday": "周一",
+      "type": "力量 + 核心",
+      "intensity": "中",
+      "duration_min": 40,
+      "detail": "深蹲、单腿硬拉、平板支撑各 3 组",
+      "calendar_time": "06:47",
+      "rest": false
+    },
+    {
+      "date": "2026-11-17",
+      "weekday": "周二",
+      "type": "节奏跑",
+      "intensity": "中",
+      "duration_min": 50,
+      "detail": "20′ 节奏段，配速略吃力但可控",
+      "calendar_time": "06:47",
+      "rest": false
+    },
+    {
+      "date": "2026-11-18",
+      "weekday": "周三",
+      "type": "长距离",
+      "intensity": "中",
+      "duration_min": 70,
+      "detail": "低强度有氧，按体感不按配速",
+      "calendar_time": "06:47",
+      "rest": false
+    },
+    {
+      "date": "2026-11-19",
+      "weekday": "周四",
+      "type": "恢复日",
+      "intensity": "休息",
+      "duration_min": 0,
+      "detail": "完全休息，复盘本周数据",
+      "calendar_time": "08:00",
+      "rest": true
+    }
+  ],
+  "user_note": "",
+  "readonly_note": "Garmin Connect Personal API 目前只提供只读端点，无法把训练课表写回 Connect 训练库或推送到手表。请通过下方 ICS 日历订阅或在 Connect 网页版手动创建训练；本页提供可直接复制的录入清单。",
+  "import_steps": [
+    "订阅 plan.ics（手机日历 / Outlook / Google Calendar 均可自动同步，按课表时间提前 10 分钟提醒）",
+    "或在 Garmin Connect 网页版 → 训练 → 训练计划 / 日历中按下方清单手动创建，保存后同步到手表",
+    "第三方训练平台（TrainingPeaks 等）如有官方写入权限，可自行对接 plan.json",
+    "Personal API Key 到期后到 Connect 设置页重建，并在 GitHub Secrets 中更新"
+  ]
+}
