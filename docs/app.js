@@ -90,7 +90,7 @@
     if (meta.errors && Object.keys(meta.errors).length) {
       notes.push("本次构建有 " + Object.keys(meta.errors).length + " 项端点告警，详情见构建元信息。");
     }
-    if (meta.fallbacks && meta.fallbacks.length) notes.push("构建时已降级为逐日拉取端点：" + esc(meta.fallbacks.join("、")));
+    if (meta.fallbacks && meta.fallbacks.length) notes.push("部分范围端点不支持长跨度查询，已自动逐日补齐：<b>" + esc(meta.fallbacks.join("、")) + "</b>；数据完整，可正常查看。");
     if (!isReal) notes.push("未检测到真实数据：请在仓库 Settings → Secrets and variables → Actions 中配置 <b>GARMIN_PERSONAL_API_KEY</b> 并手动运行一次 daily workflow。");
 
     const box = $("notice");

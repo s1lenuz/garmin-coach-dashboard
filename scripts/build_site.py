@@ -113,12 +113,21 @@ def fetch_dataset() -> dict:
         records, coverage = normalizer.normalize(raw)
         if not records:
             raise RuntimeError("响应为空")
+        errors = dict(raw.get("errors", {}))
+        fallbacks = list(raw.get("fallbacks", []))
+        # 长跨度（90 天）范围端点可能被官方拒绝（如 sleep 返回 400），
+        # 客户端会自动逐日补齐。若所有指标都覆盖了每一天，这属于正常路径，
+        # 不该在公开页面上显示成红色故障告警。
+        cov = coverage_of(records)
+        if errors and "auth" not in errors and cov and all(v == len(records) for v in cov.values()):
+            log(f"范围端点失败但逐日补齐成功：{','.join(errors.keys())}，数据完整")
+            errors = {}
         return {
             "source": "garmin",
             "records": records,
             "coverage": coverage,
-            "errors": raw.get("errors", {}),
-            "fallbacks": raw.get("fallbacks", []),
+            "errors": errors,
+            "fallbacks": fallbacks,
             "fallback_reason": "",
             "region": raw.get("region"),
             "fetched_at": raw.get("fetched_at", now_iso()),

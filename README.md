@@ -33,6 +33,7 @@ flowchart TB
 | Widget | `/widget.html` | 紧凑小卡片，适合 iframe 或手机桌面小组件 |
 | 数据 | `/data/widget.json`、`/data/plan.json`、`/data/plan.ics`、`/data/meta.json` | 供第三方小组件 / 日历订阅 / 调试 |
 
+本项目实例：**https://s1lenuz.github.io/garmin-coach-dashboard/**（仓库 `s1lenuz/garmin-coach-dashboard`）。
 完整地址形如 `https://<owner>.github.io/<repo>/`。
 
 ## 每天发生了什么
@@ -94,7 +95,7 @@ Key 只存在于 Actions 进程的环境中，**不会**进入代码、快照、
 ├── scripts/
 │   ├── build_site.py             # 主构建器：拉数 → 分析 → 解读 → 快照
 │   ├── build_plan.py             # 负荷判定、评语、课表、ICS
-│   └── publish_github.py         # 一次性初始化远端仓库（走 api.github.com）
+│   └── publish_github.py         # 一次性初始化：建仓库 / 开 Pages / 写 Secrets（走 api.github.com）
 ├── inbox/NOTES.md                # 你的随手记
 ├── config.py / garmin_client.py / normalizer.py / analyzer.py / llm_interpreter.py
 ├── server.py / web/              # 本地桌面版（含网页设置面板，可选）
@@ -103,6 +104,20 @@ Key 只存在于 Actions 进程的环境中，**不会**进入代码、快照、
 
 零第三方依赖：后端只用 Python 标准库，前端自绘 SVG 图表，不加载任何 CDN。
 本地运行桌面版：`python server.py` → http://127.0.0.1:8765 ，详见 `LOCAL_DASHBOARD.md`。
+
+## 本机推送（网络受限场景）
+
+本机 `github.com` 直连不通，但 HTTP 代理可用。实测代理端口是 **7897**（不是常见的 7890），
+仓库已在 `.git/config` 里配好，代理软件开着就能直接推：
+
+```bash
+git config --local http.proxy http://127.0.0.1:7897   # 端口变了改这里
+git add -A && git commit -m "update" && git push origin main
+```
+
+代理不可用时，`api.github.com` 仍可直连，可用
+`python scripts/publish_github.py --no-initial` 单独重设 Pages / Secrets / 手动触发构建。
+`.env` 与根目录 `data/` 已被 `.gitignore` 排除，**切勿用 `git add -f` 强制加入**。
 
 ## 关闭自动发布 / 清理
 
@@ -116,6 +131,7 @@ Key 只存在于 Actions 进程的环境中，**不会**进入代码、快照、
 ## 已知边界
 
 - GitHub Actions 的 cron 不保证准点，高峰期可能延迟数分钟到数十分钟。
+- 90 天跨度的睡眠范围端点可能返回 HTTP 400，客户端会自动逐日补齐；只要各指标覆盖完整就不视为故障（页面只提示「已自动逐日补齐」）。
 - Personal API Key 到期后要回 Connect 设置页重建并更新 Secret；token 24 小时有效、无 refresh token，代码会自动重换。
 - 官方 API 下发的 .FIT 会剥离 VO2max、恢复时间等专有字段；睡眠 / HRV / 卡路里是公开字段，够用。
 - 若设备返回的字段名与映射表不同，在 `normalizer.py` 的 `FIELD_CANDIDATES` 补一条候选路径；缺失值一律留空、不会补 0。
