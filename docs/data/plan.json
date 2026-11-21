@@ -1,27 +1,27 @@
 {
-  "generated_at": "2026-11-20T03:45:02.686490+00:00",
-  "week_start": "2026-11-20",
-  "week_end": "2026-11-26",
+  "generated_at": "2026-11-21T03:31:25.834925+00:00",
+  "week_start": "2026-11-21",
+  "week_end": "2026-11-27",
   "status": {
     "level": "build",
     "label": "稳步加量",
-    "reason": "近 14 天夜间 HRV 均值 49 ms，个人基线下限约 45 ms；低于基线 0/14 天；睡眠评分均值 86 分；日均活动消耗 300 kcal；日均步数 6111。",
+    "reason": "近 14 天夜间 HRV 均值 49 ms，个人基线下限约 45 ms；低于基线 0/14 天；睡眠评分均值 85 分；日均活动消耗 294 kcal；日均步数 5708。",
     "window_days": 14,
     "hrv_avg14": 49.285714285714285,
     "baseline_low": 45.0,
     "below_baseline_days": 0,
     "hrv_covered_days": 14,
-    "sleep_score_avg14": 85.71428571428571,
-    "active_kcal_avg14": 299.7857142857143,
-    "steps_avg14": 6111.428571428572
+    "sleep_score_avg14": 84.57142857142857,
+    "active_kcal_avg14": 294.35714285714283,
+    "steps_avg14": 5707.642857142857
   },
-  "coach_note": "本周判定：**稳步加量**。近 14 天夜间 HRV 均值 49 ms，个人基线下限约 45 ms；低于基线 0/14 天；睡眠评分均值 86 分；日均活动消耗 300 kcal；日均步数 6111。\nAI 趋势解读：相关性上，睡眠时长 → 次日 HRV 呈中等正相关（r=0.4，基于 29 组配对）。\n课表是建议不是医嘱；HRV 连续两天低于基线就把当天改成休息。",
+  "coach_note": "本周判定：**稳步加量**。近 14 天夜间 HRV 均值 49 ms，个人基线下限约 45 ms；低于基线 0/14 天；睡眠评分均值 85 分；日均活动消耗 294 kcal；日均步数 5708。\nAI 趋势解读：相关性上，睡眠时长 → 次日 HRV 呈中等正相关（r=0.37，基于 29 组配对）。\n课表是建议不是医嘱；HRV 连续两天低于基线就把当天改成休息。",
   "coach_note_source": "rule",
   "weekly_goal": "本周合计建议训练 6 次 / 315 分钟，以「稳步加量」为主轴；重点观察 HRV 是否回到个人基线区间。",
   "days": [
     {
-      "date": "2026-11-20",
-      "weekday": "周五",
+      "date": "2026-11-21",
+      "weekday": "周六",
       "type": "轻松跑",
       "intensity": "低",
       "duration_min": 45,
@@ -30,8 +30,8 @@
       "rest": false
     },
     {
-      "date": "2026-11-21",
-      "weekday": "周六",
+      "date": "2026-11-22",
+      "weekday": "周日",
       "type": "间歇跑",
       "intensity": "高",
       "duration_min": 50,
@@ -40,8 +40,8 @@
       "rest": false
     },
     {
-      "date": "2026-11-22",
-      "weekday": "周日",
+      "date": "2026-11-23",
+      "weekday": "周一",
       "type": "力量 + 核心",
       "intensity": "中",
       "duration_min": 45,
@@ -50,8 +50,8 @@
       "rest": false
     },
     {
-      "date": "2026-11-23",
-      "weekday": "周一",
+      "date": "2026-11-24",
+      "weekday": "周二",
       "type": "恢复跑",
       "intensity": "低",
       "duration_min": 35,
@@ -60,8 +60,8 @@
       "rest": false
     },
     {
-      "date": "2026-11-24",
-      "weekday": "周二",
+      "date": "2026-11-25",
+      "weekday": "周三",
       "type": "节奏跑",
       "intensity": "中",
       "duration_min": 55,
@@ -70,8 +70,8 @@
       "rest": false
     },
     {
-      "date": "2026-11-25",
-      "weekday": "周三",
+      "date": "2026-11-26",
+      "weekday": "周四",
       "type": "长距离",
       "intensity": "中",
       "duration_min": 85,
@@ -80,8 +80,8 @@
       "rest": false
     },
     {
-      "date": "2026-11-26",
-      "weekday": "周四",
+      "date": "2026-11-27",
+      "weekday": "周五",
       "type": "恢复日",
       "intensity": "休息",
       "duration_min": 0,
